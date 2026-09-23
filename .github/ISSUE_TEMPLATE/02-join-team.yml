@@ -10,7 +10,7 @@ body:
       value: |
         The teams that already exist, and how much room each has left, are listed on [the assignment's page](https://hertie-dsl-demo-f2026.github.io/assignments/03-assignment-3-project.html).
 
-        To **join** one, choose *Join an existing team* and type its name exactly as that page spells it. To **start** one, choose *Create a new team* and pick a name nobody is using yet.
+        To **join** one, choose *Join an existing team* and type its name exactly as that page spells it. To **start** one, choose *Create a new team* and pick a name nobody is using yet. To **move** to another team while team formation is open, choose *Switch to another team* and type the team you are moving to.
   # dsl:assignment-field:start - AUTO-GENERATED from this cohort's
   # `classroom-config/assignments.lock.yml`: the assignments open for team
   # formation right now. Edits between these markers are overwritten.
@@ -28,17 +28,18 @@ body:
     id: action
     attributes:
       label: Action
-      description: Joining a team and starting one are different things - say which, so a typo in the name below cannot silently open a second team.
+      description: Joining a team, starting one and moving to another are different things - say which, so a typo in the name below cannot silently open a second team.
       options:
         - Join an existing team
         - Create a new team
+        - Switch to another team
     validations:
       required: true
   - type: input
     id: team
     attributes:
       label: Team
-      description: "Team name (letters, numbers, dashes)."
+      description: "Team name (letters, numbers, dashes). For a switch, the team you are moving to."
       placeholder: "e.g. team-x"
     validations:
       required: true
