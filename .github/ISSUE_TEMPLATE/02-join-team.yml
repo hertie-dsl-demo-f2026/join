@@ -8,9 +8,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        The teams that already exist, and how much room each has left, are listed in [Teams for assignment-3-project](https://github.com/hertie-dsl-demo-f2026/welcome/issues/6).
+        The teams that already exist, and how much room each has left, are listed on the assignment's page on the cohort site.
 
-        To **join** one, choose *Join an existing team* and type its name exactly as that issue spells it. To **start** one, choose *Create a new team* and pick a name nobody is using yet.
+        To **join** one, choose *Join an existing team* and type its name exactly as that page spells it. To **start** one, choose *Create a new team* and pick a name nobody is using yet.
   # dsl:assignment-field:start - AUTO-GENERATED from this cohort's
   # `classroom-config/assignments.lock.yml`: the assignments open for team
   # formation right now. Edits between these markers are overwritten.
