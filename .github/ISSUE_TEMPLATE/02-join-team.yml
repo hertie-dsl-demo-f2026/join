@@ -13,8 +13,8 @@ body:
         To **join** one, choose *Join an existing team* and type its name exactly as that page spells it. To **start** one, choose *Create a new team* and pick a name nobody is using yet.
 
         Already in a team? Joining or creating another moves you out of your current one while team formation is open.
-  # dsl:assignment-field:start - AUTO-GENERATED from this cohort's
-  # `classroom-config/assignments.lock.yml`: the assignments open for team
+  # dsl:assignment-field:start - AUTO-GENERATED from this semester's
+  # `semester-config/.system/assignments.lock.yml`: the assignments open for team
   # formation right now. Edits between these markers are overwritten.
   - type: dropdown
     id: assignment

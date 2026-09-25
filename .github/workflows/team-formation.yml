@@ -2,27 +2,27 @@
 # from the central DSL teaching toolkit by 'Refresh actions' (nightly).
 name: Form team
 
-# Seed this into a cohort's public `welcome` repo as
+# Seed this into a semester's public `join` repo as
 # .github/workflows/team-formation.yml. Students open a "Join team" issue here; the issue
 # AUTHOR is the authenticated GitHub handle (unspoofable). We verify they are an onboarded
 # ENROLLED student - auditors are read-only (released materials, no assignment repos) so they
-# are refused - then append a row to the PRIVATE classroom-config/teams.csv - the only writer
+# are refused - then append a row to the PRIVATE semester-config/teams.csv - the only writer
 # surface for team membership. A GitHub Team is materialised FROM that CSV later (one-way, by
 # dsl_course.sync_teams), so the Team is a downstream projection that can't drift the way a
 # Classroom-managed team does. Group-assignment provisioning grants that team its shared repo.
 #
 # WHETHER a team may form at all, and how big, is answered by
-# classroom-config/assignments.lock.yml - written by the toolkit from each assignment's
+# semester-config/.system/assignments.lock.yml - written by the toolkit from each assignment's
 # grading_config.yml, because that file lives in the course org and this token cannot
 # reach it. An assignment the lock does not carry, or one it marks `assigned` or `none`,
 # is refused here.
 #
 # teams.csv is PRIVATE, so the teams that exist - names and counts only - are listed on
-# the assignment's page on the cohort site, which a push to teams.csv re-syncs. The lock
+# the assignment's page on the semester site, which a push to teams.csv re-syncs. The lock
 # carries that page's URL (`team_formation_page:`) for the refusals below to link.
 #
-# Runs under secrets.DSL_BOT_TOKEN, which needs, on the cohort org: Contents R/W on
-# classroom-config, Issues R/W on welcome.
+# Runs under secrets.DSL_BOT_TOKEN, which needs, on the semester org: Contents R/W on
+# semester-config, Issues R/W on join.
 
 on:
   issues:
@@ -40,7 +40,7 @@ concurrency:
   cancel-in-progress: false
 
 # The ambient GITHUB_TOKEN comments on, labels and closes the issue in THIS repo. It gets
-# nothing else: teams.csv lives in another repo (classroom-config), which only
+# nothing else: teams.csv lives in another repo (semester-config), which only
 # DSL_BOT_TOKEN can reach, so `contents:` here would be scope with no purpose.
 permissions:
   issues: write
@@ -58,15 +58,15 @@ jobs:
         with:
           github-token: ${{ secrets.DSL_BOT_TOKEN || github.token }}
           script: |
-            const org    = context.repo.owner;            // the cohort org
+            const org    = context.repo.owner;            // the semester org
             const issue  = context.payload.issue;
             const handle = issue.user.login;              // authenticated identity
-            const CONFIG = 'classroom-config';
+            const CONFIG = 'semester-config';
             const TEAMS  = 'teams.csv', ROSTER = 'students.csv';
 
             // The half of the two onboarding workflows' github-script bodies that is the same in both.
             // Not a workflow of its own: dsl_course.welcome splices it in at their `// {shared_script}`
-            // line, so a cohort receives one file per workflow as before. It was written out twice, in
+            // line, so a semester receives one file per workflow as before. It was written out twice, in
             // two files, against one file format, with a test comparing the copies byte for byte to
             // catch the day they stopped agreeing.
             //
@@ -158,7 +158,7 @@ jobs:
               const tMatch = (issue.body || '').match(/###\s*Team\s*[\r\n]+\s*([^\r\n]+)/i);
 
               // What this assignment allows, read from the machine-written mirror the
-              // toolkit keeps at classroom-config/assignments.lock.yml - THIS FILE AND
+              // toolkit keeps at semester-config/.system/assignments.lock.yml - THIS FILE AND
               // NOTHING ELSE. The answer lives in the template's grading_config.yml, in
               // the course org, which this token deliberately cannot reach; the
               // schedule.yml scrape that stood here before let a slug with no `type:`
@@ -170,14 +170,14 @@ jobs:
               // not carry.
               //
               // `window` is null when the entry carries no `team_formation_window:` at
-              // all, which is what a cohort last synced by a toolkit older than the window
-              // looks like. That reads as OPEN below - the behaviour those cohorts have
+              // all, which is what a semester last synced by a toolkit older than the window
+              // looks like. That reads as OPEN below - the behaviour those semesters have
               // had since the form existed - never as closed.
               //
-              // `page` is the assignment's page on the cohort site, which lists the teams
+              // `page` is the assignment's page on the semester site, which lists the teams
               // that exist - "" where the lock carries none, and the refusal then names
               // the page without linking it.
-              const LOCK = 'assignments.lock.yml';
+              const LOCK = '.system/assignments.lock.yml';
               const lockEntry = async (slug) => {
                 let text;
                 try {
@@ -208,7 +208,7 @@ jobs:
               };
               // The close date is written as a bare ISO day and read by a student, so it is
               // spoken as one - `26th Oct`, dsl_course.grades.spoken_day's spelling, which
-              // the mail and the cohort site use too. Anything that is not one is printed
+              // the mail and the semester site use too. Anything that is not one is printed
               // as it stands rather than guessed at.
               const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
               const spokenDate = (iso) => {
@@ -250,7 +250,7 @@ jobs:
               const slug = `${assignment}-${team}`;
               // ONE reason-free message for every unavailable name. This issue is public, so a
               // message that said WHY ("a team can't be named after a GitHub handle") answered,
-              // for any name anyone cared to try, whether that person is in this cohort.
+              // for any name anyone cared to try, whether that person is in this semester.
               const NAME_TAKEN =
                 `Thanks @${handle} - that assignment + team combination isn't available. ` +
                 `[Open a new Join team issue](${newIssue('')}) with another team name.`;
@@ -264,7 +264,7 @@ jobs:
               const iRosterHandle = rosterHeader.indexOf('github_handle');
               // `role` is OPTIONAL - a roster seeded before the column existed has none, and a
               // missing/blank cell means `enrolled` (dsl_course.roster.normalise_role). Never
-              // required, so an older cohort's students keep forming teams.
+              // required, so an older semester's students keep forming teams.
               const iRole = rosterHeader.indexOf('role');
               if (iRosterHandle < 0) return fail(
                 `Thanks @${handle} - the roster's header is missing a \`github_handle\` column. ` +
@@ -275,7 +275,7 @@ jobs:
               // published the author's enrolment role to anyone who could read the repo.
               const NOT_A_PARTICIPANT =
                 `Thanks @${handle} - I can't find you on the course enrolment roster yet. Please open a **Join course** issue first ` +
-                `to onboard, then come back to join a team. If you have already joined, contact the teaching team.`;
+                `to onboard, then come back to join a team. If you have already joined, contact your instructors.`;
               const myRow = rosterTable.slice(1)
                 .find(r => (r[iRosterHandle] || '').trim().toLowerCase() === handle.toLowerCase());
               if (!myRow) return fail(NOT_A_PARTICIPANT, 'needs-review');
@@ -316,11 +316,11 @@ jobs:
               // to be refused, and only one of them is the student's to fix.
               const lock = await lockEntry(assignment);
               if (lock === undefined) return fail(
-                `Thanks @${handle} - I can't read this cohort's assignment list ` +
-                `(\`classroom-config/${LOCK}\` isn't there). A maintainer will action this.`,
+                `Thanks @${handle} - I can't read this semester's assignment list ` +
+                `(\`${CONFIG}/${LOCK}\` isn't there). A maintainer will action this.`,
                 'needs-review');
               if (lock === null) return refuse(
-                `Thanks @${handle} - \`${assignment}\` isn't an assignment in this cohort. ` +
+                `Thanks @${handle} - \`${assignment}\` isn't an assignment in this semester. ` +
                 `Check the slug on the course site, then [open a new Join team issue](${newIssue(team)}).`);
               if (lock.formation === 'none') return refuse(
                 `Thanks @${handle} - \`${assignment}\` is an individual assignment, so there are no teams ` +
@@ -330,11 +330,11 @@ jobs:
               // workflow. Both mean the same thing to a student: wait to be added.
               if (lock.formation !== 'self_select') return refuse(
                 `Thanks @${handle} - teams for \`${assignment}\` are assigned by the instructor. ` +
-                `The teaching team will add you to one; there is nothing for you to do here.`);
+                `Your instructors will add you to one; there is nothing for you to do here.`);
               // The formation WINDOW, which runs from the handout to the grading pin. Only
               // an explicit `pending` or `closed` refuses: a lock written by a toolkit older
               // than the window carries no such scalar at all (`window` is null), and that
-              // has to go on behaving exactly as it did - a cohort mid-semester must not
+              // has to go on behaving exactly as it did - a semester that is running must not
               // lose team formation because its nightly sync has not run yet.
               // `pending` and `closed` are the two sides of the window and they must not
               // share a sentence: before the handout `closes` is still in the FUTURE, so
@@ -348,7 +348,7 @@ jobs:
               if (lock.window === 'closed') return refuse(
                 `Thanks @${handle} - team formation for \`${assignment}\` ` +
                 (lock.closes ? `closed on ${spokenDate(lock.closes)}.` : `is closed.`) +
-                ` Contact the teaching team if you still need a team for it.`);
+                ` Contact your instructors if you still need a team for it.`);
               const cap = lock.cap;
               if (!(cap > 0)) return fail(
                 `Thanks @${handle} - \`${assignment}\` has no team-size cap recorded. ` +
