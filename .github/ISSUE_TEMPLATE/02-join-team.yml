@@ -25,6 +25,7 @@ body:
       description: The group assignment you are forming a team for.
       options:
         - assignment-3-project
+        - assignment-8
     validations:
       required: true
   # dsl:assignment-field:end
