@@ -10,7 +10,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        The teams that already exist, and how much room each has left, are listed on [the assignment's page](https://hertie-dsl-demo-f2026.github.io/assignments/08-assignment-3-project.html).
+        The teams that already exist, and how much room each has left, are listed in [the student console, under Assignments](https://hertie-data-science-lab.github.io/dsl-teaching-toolkit/?semester=hertie-dsl-demo-f2026#assignment-assignment-3-project).
 
         To **join** one, choose *Join or switch to an existing team* and type its name exactly as that page spells it. To **start** one, choose *Create a new team* and pick a name nobody is using yet.
 
